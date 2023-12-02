@@ -7,6 +7,7 @@ def part1(filename):
 
 def part2(filename):
     pass
+
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         print(f'Usage: python {sys.argv[0]} [1|2] <input_file>')
