@@ -67,22 +67,6 @@ def part2(filename):
 
     numbers, machineparts = e.collect() 
 
-    s = 0
-    def near(nr, nc, nv):
-        for pr, pc, pl in machineparts:
-            if abs(pr - nr) <= 1:
-                # start on or 1 after
-                if 0 <= nc - pc <= 1:
-                    return True
-                # end on or 1 before
-                if 0 <= pc - (nc + len(nv) - 1) <= 1:
-                    return True
-                # overlap
-                if nc <= pc <= nc + len(nv) - 1:
-                    return True
-
-        return False
-
     def near2(pr, pc, pt):
         nearby = []
         for nr, nc, nv in numbers:
