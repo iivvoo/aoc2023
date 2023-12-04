@@ -18,30 +18,25 @@ class Card:
         self.matches = set(self.wins) & set(self.haves)
 
 
-def part1(filename):
+def part1(filename: str):
     s = 0
     with open(filename, "r") as f:
         for l in f.readlines():
-            card = Card(l)
-            matches = len(card.matches)
-            if matches:
+            if matches := len(Card(l).matches):
                 s += 2 ** (matches - 1)
 
     print(s)
 
 
-def part2(filename):
+def part2(filename: str):
     cards = []
     with open(filename, "r") as f:
-        for l in f.readlines():
-            card = Card(l)
-            cards.append(card)
+        cards = [Card(l) for l in f.readlines()]
 
     counts = defaultdict(lambda: 1)
     for i, card in enumerate(cards):
         amount = counts[i]
-        matches = len(card.matches)
-        if matches:
+        if matches := len(card.matches):
             for extra in range(matches):
                 counts[i + extra + 1] += amount
 
