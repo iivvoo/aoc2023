@@ -31,7 +31,8 @@ class Mapping:
 
         return seed
 
-def part1(filename):
+
+def parse(filename: str) -> Tuple[list[int], dict[str, Mapping]]:
     mappings: dict[str, Mapping] = {}
     current: Mapping | None = None
 
@@ -54,13 +55,16 @@ def part1(filename):
             assert current is not None
             current.single_maps.append(SingleMap(*values))
 
-    # print(seeds)
-    # print(mappings)
+    return seeds, mappings
 
+
+def lowest(seeds: list[int], mappings: dict[str, Mapping]) -> int:
     lowest = -1
 
+    c = 0
+    print("Boep")
     for seed in seeds:
-        print(seed, " -> ", end="")
+        # print(seed, " -> ", end="")
         for mapping in (
             "seed-to-soil",
             "soil-to-fertilizer",
@@ -71,16 +75,32 @@ def part1(filename):
             "humidity-to-location",
         ):
             seed = mappings[mapping].map(seed)
-            print(seed, ", ", end="")
-        print(seed)
+            # print(seed, ", ", end="")
+        # print(seed)
         if lowest == -1 or seed < lowest:
             lowest = seed
+        c += 1
+        if c % 1000000 == 0:
+            print(c)
 
-    print(lowest)
+    return lowest
 
 
-def part2(filename):
-    pass
+def part1(filename: str) -> None:
+    seeds, mappings = parse(filename)
+    print(lowest(seeds, mappings))
+
+from concurrent.futures import ProcessPoolExecutor
+
+
+def part2(filename: str) -> None:
+    seeds, mappings = parse(filename)
+
+    with ProcessPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(lowest, list(range(s, s+l)), mappings) for (s, l) in zip(seeds[::2], seeds[1::2])]
+        results = [future.result() for future in futures]
+
+    print(min(results))
 
 
 if __name__ == "__main__":
