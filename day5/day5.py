@@ -82,6 +82,7 @@ def part1(filename: str) -> None:
     seeds, mappings = parse(filename)
     print(lowest(seeds, mappings))
 
+
 from concurrent.futures import ProcessPoolExecutor
 
 
@@ -89,7 +90,10 @@ def part2(filename: str) -> None:
     seeds, mappings = parse(filename)
 
     with ProcessPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(lowest, list(range(s, s+l)), mappings) for (s, l) in zip(seeds[::2], seeds[1::2])]
+        futures = [
+            executor.submit(lowest, list(range(s, s + l)), mappings)
+            for (s, l) in zip(seeds[::2], seeds[1::2])
+        ]
         results = [future.result() for future in futures]
 
     print(min(results))
