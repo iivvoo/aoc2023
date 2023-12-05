@@ -61,10 +61,7 @@ def parse(filename: str) -> Tuple[list[int], dict[str, Mapping]]:
 def lowest(seeds: list[int], mappings: dict[str, Mapping]) -> int:
     lowest = -1
 
-    c = 0
-    print("Boep")
     for seed in seeds:
-        # print(seed, " -> ", end="")
         for mapping in (
             "seed-to-soil",
             "soil-to-fertilizer",
@@ -75,13 +72,8 @@ def lowest(seeds: list[int], mappings: dict[str, Mapping]) -> int:
             "humidity-to-location",
         ):
             seed = mappings[mapping].map(seed)
-            # print(seed, ", ", end="")
-        # print(seed)
         if lowest == -1 or seed < lowest:
             lowest = seed
-        c += 1
-        if c % 1000000 == 0:
-            print(c)
 
     return lowest
 
