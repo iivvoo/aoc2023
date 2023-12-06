@@ -31,7 +31,13 @@ def part1(filename: str) -> None:
 
 
 def part2(filename: str) -> None:
-    pass
+    with open(filename, "r") as f:
+        duration = int("".join(f.readline().split(": ")[1].split()))
+        distance = int("".join(f.readline().split(": ")[1].split()))
+
+    race = Race(duration, distance)
+
+    print(race.wins())
 
 
 if __name__ == "__main__":
