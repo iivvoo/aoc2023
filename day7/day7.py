@@ -148,7 +148,7 @@ def part2(filename: str) -> None:
     with open(filename, "r") as f:
         for line in f.readlines():
             labels, bid = line.split()
-            bids.append(Bid(Hand([Card(l, True) for l in labels], True), int(bid)))
+            bids.append(Bid(Hand([Card(l, WithJoker=True) for l in labels], WithJoker=True), int(bid)))
 
     bids = sorted(bids)
 
