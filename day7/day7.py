@@ -18,8 +18,6 @@ class Type(IntEnum):
     FIVE_OF_A_KIND = 9
 
 
-# A K Q J T 9 .. 2
-
 values = {
     "2": 2,
     "3": 3,
@@ -41,8 +39,14 @@ values = {
 @total_ordering
 class Card:
     Label: str
+    WithJoker: bool = False
 
     def __lt__(self, other: "Card") -> bool:
+        if self.WithJoker:
+            if self.Label == "J" and other.Label != "J":
+                return True
+            if other.Label == "J":
+                return False
         return values[self.Label] < values[other.Label]
 
     def __eq__(self, other: "Card") -> bool:
@@ -56,38 +60,46 @@ class Card:
 @total_ordering
 class Hand:
     cards: List[Card]
-
-    """
-        Determine type, where type also maps to a value, the higher the better
-
-        Sort Cards first? -> 12345 LLKKK etc
-        Group by equals -> LL KKK  / 1 2 3 4 5
-
-
-    """
+    WithJoker: bool = False
 
     def type(self) -> Type:
         counts = collections.defaultdict(int)
         for c in self.cards:
             counts[c] += 1
+
+        jokers = 0
+
+        if self.WithJoker:
+            jokers = counts[Card("J")]
+
+            # account for all jokers
+            if jokers == 5:
+                return Type.FIVE_OF_A_KIND
+
+            del counts[Card("J")]
+
         vals = sorted(counts.values())
 
-        if vals == [5]:
+        if vals[-1] + jokers == 5:
             return Type.FIVE_OF_A_KIND
-        if vals == [1, 4]:
+
+        if vals[-1] + jokers == 4:
             return Type.FOUR_OF_A_KIND
-        if vals == [2, 3]:
+
+        if vals[-1] + jokers == 3 and vals[-2] == 2:
             return Type.FULL_HOUSE
-        if 3 in vals:
+
+        if vals[-1] + jokers == 3:
             return Type.THREE_OF_A_KIND
-        if vals == [1, 2, 2]:
+
+        if vals[-1] + jokers == 2 and vals[-2] == 2:
             return Type.TWO_PAIRS
-        if 2 in vals:
+
+        if vals[-1] + jokers == 2:
             return Type.ONE_PAIR
 
         return Type.HIGH_CARD
 
-    # These comparisons only apply if they're the same "type"
     def __lt__(self, other: "Hand") -> bool:
         if self.type() == other.type():
             return self.cards < other.cards
@@ -132,7 +144,15 @@ def part1(filename: str) -> None:
 
 
 def part2(filename: str) -> None:
-    pass
+    bids = []
+    with open(filename, "r") as f:
+        for line in f.readlines():
+            labels, bid = line.split()
+            bids.append(Bid(Hand([Card(l, True) for l in labels], True), int(bid)))
+
+    bids = sorted(bids)
+
+    print(sum(b.bid * v for v, b in enumerate(bids, 1)))
 
 
 if __name__ == "__main__":
