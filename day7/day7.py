@@ -106,7 +106,7 @@ class Hand:
         return self.type() < other.type()
 
     def __eq__(self, other: "Hand") -> bool:
-        if self.type() != other.type():
+        if self.type() == other.type():
             # unlikely
             return self.cards == other.cards
         return False
