@@ -12,7 +12,6 @@ def part1(filename: str) -> None:
         f.readline()
         for line in f.readlines():
             source, ldir, rdir, _ = re.split("[^A-Z]+", line.strip())
-            print(source, ldir, rdir)
             map[source] = {"L": ldir, "R": rdir}
 
         current = "AAA"
@@ -33,7 +32,6 @@ def part2(filename: str) -> None:
         f.readline()
         for line in f.readlines():
             source, ldir, rdir, _ = re.split(r"[^\w]+", line.strip())
-            # print(source, ldir, rdir)
             map[source] = {"L": ldir, "R": rdir}
 
         starts = [k for k in map.keys() if k[-1] == "A"]
