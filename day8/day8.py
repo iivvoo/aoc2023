@@ -2,6 +2,7 @@
 
 import sys
 import re
+import math
 
 def part1(filename: str) -> None:
     map = {}
@@ -25,8 +26,33 @@ def part1(filename: str) -> None:
                     return
 
 def part2(filename: str) -> None:
-    pass
+    map = {}
 
+    with open(filename, "r") as f:
+        instructions = f.readline().strip()
+        f.readline()
+        for line in f.readlines():
+            source, ldir, rdir, _ = re.split(r"[^\w]+", line.strip())
+            # print(source, ldir, rdir)
+            map[source] = {"L": ldir, "R": rdir}
+
+        starts = [k for k in map.keys() if k[-1] == "A"]
+        loops = {}
+
+        for p in starts:
+            count = 0
+            current = p
+            while True:
+                for instr in instructions:
+                    count += 1
+                    current = map[current][instr]
+                    if current[-1] == "Z":
+                        loops[p] = count
+                        break
+                if p in loops:
+                    break
+
+        print(math.lcm(*loops.values()))
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
