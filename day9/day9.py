@@ -2,12 +2,12 @@
 
 import sys
 from functools import reduce
-
+from itertools import pairwise
 
 def predict(values: list[int]) -> int:
     p = values[-1]
     while values.count(values[0]) != len(values):
-        values = [b - a for a, b in zip(values, values[1:])]
+        values = [b - a for a, b in pairwise(values)]
         p += values[-1]
     return p
 
@@ -16,7 +16,7 @@ def predict2(values: list[int]) -> int:
     befores = [values[0]]
 
     while values.count(values[0]) != len(values):
-        values = [b - a for a, b in zip(values, values[1:])]
+        values = [b - a for a, b in pairwise(values)]
         befores.insert(0, values[0])
 
     v = reduce(lambda a, b: b - a, befores)
