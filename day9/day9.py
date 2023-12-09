@@ -32,11 +32,7 @@ def part1(filename: str) -> None:
 
 
 def part2(filename: str) -> None:
-    s = 0
-    for line in open(filename, "r"):
-        values = [int(v) for v in line.split()]
-        s += predict2(values)
-    print(s)
+    print(sum(predict2([int(v) for v in line.split()]) for line in open(filename, "r")))
 
 
 if __name__ == "__main__":
