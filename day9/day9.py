@@ -35,11 +35,22 @@ def part2(filename: str) -> None:
     print(sum(predict2([int(v) for v in line.split()]) for line in open(filename, "r")))
 
 
+def part2_smart(filename: str) -> None:
+    # didn't realize this myself
+    s = 0
+    for line in open(filename, "r"):
+        values = [int(v) for v in line.split()]
+        s += predict(values[::-1])
+    print(s)
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print(f"Usage: python {sys.argv[0]} [1|2] <input_file>")
         sys.exit(1)
     if sys.argv[1] == "1":
         part1(sys.argv[2])
-    else:
+    elif sys.argv[1] == "2":
         part2(sys.argv[2])
+    else:
+        part2_smart(sys.argv[2])
