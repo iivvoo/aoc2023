@@ -11,36 +11,28 @@ class Galaxy:
     r: int
     c: int
 
-    def distance(self, other: Self) -> int:
-        return abs(self.r - other.r) + abs(self.c - other.c)
-
 
 class Universe:
-    def __init__(self):
+    def __init__(self, expansion_rate: int = 2):
         self.rows: list[list[str]] = []
         self.galaxies: list[Galaxy] = []
+        self.expanded_rows: list[int] = []
+        self.expanded_cols: list[int] = []
+        self.expansion_rate = expansion_rate
 
     def add(self, row: str) -> None:
         self.rows.append(list(row))
 
-    def expand(self) -> None:
+    def expand(self, rate=2) -> None:
         """expand rows and cols"""
-        expand_rows = []
         for i, r in enumerate(self.rows):
             if set(r) == {"."}:
-                expand_rows.append(i)
+                self.expanded_rows.append(i)
 
-        for i in expand_rows[::-1]:
-            self.rows.insert(i, ["."] * len(self.rows[0]))
-
-        expand_cols = []
         for i in range(len(self.rows[0])):
             if set(r[i] for r in self.rows) == {"."}:
-                expand_cols.append(i)
+                self.expanded_cols.append(i)
 
-        for j in expand_cols[::-1]:
-            for r in self.rows:
-                r.insert(j, ".")
 
     def collect(self) -> None:
         """collect galaxies"""
@@ -49,8 +41,24 @@ class Universe:
                 if col == "#":
                     self.galaxies.append(Galaxy(r, c))
 
+    def distance(self, one: Galaxy, other: Galaxy) -> int:
+        d = 0
+        for r in range(min(one.r, other.r), max(one.r, other.r)):
+            if r in self.expanded_rows:
+                d += self.expansion_rate
+            else:
+                d += 1
+
+        for c in range(min(one.c, other.c), max(one.c, other.c)):
+            if c in self.expanded_cols:
+                d += self.expansion_rate
+            else:
+                d += 1
+        return d
+
+
     def __str__(self) -> str:
-        return "\n".join("".join(r) for r in self.rows)
+        return "\n".join("".join(f"{r}") for r in self.rows)
 
 
 def part1(filename: str) -> None:
@@ -65,20 +73,38 @@ def part1(filename: str) -> None:
     s = 0
 
     for g, h in itertools.combinations(universe.galaxies, 2):
-        s += g.distance(h)
+        s += universe.distance(g, h)
 
     print(s)
 
 
-def part2(filename: str) -> None:
-    pass
+def part2(filename: str, expansion_rate=1000000) -> None:
+    universe = Universe(expansion_rate=expansion_rate)
+
+    for line in open(filename, "r"):
+        universe.add(line.strip())
+
+    universe.expand()
+    universe.collect()
+
+    s = 0
+
+    for g, h in itertools.combinations(universe.galaxies, 2):
+        s += universe.distance(g, h)
+
+    print(s)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print(f"Usage: python {sys.argv[0]} [1|2] <input_file>")
+    if len(sys.argv) < 3:
+        print(f"Usage: python {sys.argv[0]} [1|2] <input_file> [expansion_rate]")
         sys.exit(1)
+
+    expansion_rate = 1000000
+
+    if len(sys.argv) == 4:
+        expansion_rate = int(sys.argv[3])
     if sys.argv[1] == "1":
         part1(sys.argv[2])
     else:
-        part2(sys.argv[2])
+        part2(sys.argv[2], expansion_rate)
