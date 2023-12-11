@@ -31,10 +31,12 @@ class Universe:
 
     def collect(self) -> None:
         """collect galaxies"""
-        for r, row in enumerate(self.rows):
-            for c, col in enumerate(row):
-                if col == "#":
-                    self.galaxies.append(Galaxy(r, c))
+        self.galaxies = [
+            Galaxy(r, c)
+            for r, row in enumerate(self.rows)
+            for c, col in enumerate(row)
+            if col == "#"
+        ]
 
     def distance(self, one: Galaxy, other: Galaxy) -> int:
         """(shortest) distance between galaxies, taking expansion into account"""
