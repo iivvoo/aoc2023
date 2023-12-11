@@ -13,14 +13,14 @@ class Galaxy:
 
 class Universe:
     def __init__(self, expansion_rate: int = 2):
-        self.rows: list[list[str]] = []
+        self.rows: list[str] = []
         self.galaxies: list[Galaxy] = []
         self.expanded_rows: list[int] = []
         self.expanded_cols: list[int] = []
         self.expansion_rate = expansion_rate
 
     def add(self, row: str) -> None:
-        self.rows.append(list(row))
+        self.rows.append(row)
 
     def expand(self) -> None:
         """expand rows and cols"""
@@ -48,9 +48,6 @@ class Universe:
             self.expansion_rate if c in self.expanded_cols else 1
             for c in range(min(one.c, other.c), max(one.c, other.c))
         )
-
-    def __str__(self) -> str:
-        return "\n".join("".join(f"{r}") for r in self.rows)
 
 
 def solve(filename: str, expansion_rate=1000000) -> None:
