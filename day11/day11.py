@@ -2,7 +2,6 @@
 
 import sys
 from dataclasses import dataclass
-from typing import Self
 import itertools
 
 
@@ -33,7 +32,6 @@ class Universe:
             if set(r[i] for r in self.rows) == {"."}:
                 self.expanded_cols.append(i)
 
-
     def collect(self) -> None:
         """collect galaxies"""
         for r, row in enumerate(self.rows):
@@ -42,20 +40,13 @@ class Universe:
                     self.galaxies.append(Galaxy(r, c))
 
     def distance(self, one: Galaxy, other: Galaxy) -> int:
-        d = 0
-        for r in range(min(one.r, other.r), max(one.r, other.r)):
-            if r in self.expanded_rows:
-                d += self.expansion_rate
-            else:
-                d += 1
-
-        for c in range(min(one.c, other.c), max(one.c, other.c)):
-            if c in self.expanded_cols:
-                d += self.expansion_rate
-            else:
-                d += 1
-        return d
-
+        return sum(
+            self.expansion_rate if r in self.expanded_rows else 1
+            for r in range(min(one.r, other.r), max(one.r, other.r))
+        ) + sum(
+            self.expansion_rate if c in self.expanded_cols else 1
+            for c in range(min(one.c, other.c), max(one.c, other.c))
+        )
 
     def __str__(self) -> str:
         return "\n".join("".join(f"{r}") for r in self.rows)
@@ -70,7 +61,9 @@ def part1(filename: str) -> None:
     universe.expand()
     universe.collect()
 
-    answer = sum(universe.distance(g, h) for g, h in itertools.combinations(universe.galaxies, 2))
+    answer = sum(
+        universe.distance(g, h) for g, h in itertools.combinations(universe.galaxies, 2)
+    )
 
     print(answer)
 
@@ -84,7 +77,9 @@ def part2(filename: str, expansion_rate=1000000) -> None:
     universe.expand()
     universe.collect()
 
-    answer = sum(universe.distance(g, h) for g, h in itertools.combinations(universe.galaxies, 2))
+    answer = sum(
+        universe.distance(g, h) for g, h in itertools.combinations(universe.galaxies, 2)
+    )
 
     print(answer)
 
