@@ -52,23 +52,7 @@ class Universe:
         return "\n".join("".join(f"{r}") for r in self.rows)
 
 
-def part1(filename: str) -> None:
-    universe = Universe()
-
-    for line in open(filename, "r"):
-        universe.add(line.strip())
-
-    universe.expand()
-    universe.collect()
-
-    answer = sum(
-        universe.distance(g, h) for g, h in itertools.combinations(universe.galaxies, 2)
-    )
-
-    print(answer)
-
-
-def part2(filename: str, expansion_rate=1000000) -> None:
+def solve(filename: str, expansion_rate=1000000) -> None:
     universe = Universe(expansion_rate=expansion_rate)
 
     for line in open(filename, "r"):
@@ -94,6 +78,6 @@ if __name__ == "__main__":
     if len(sys.argv) == 4:
         expansion_rate = int(sys.argv[3])
     if sys.argv[1] == "1":
-        part1(sys.argv[2])
+        solve(sys.argv[2], expansion_rate=2)
     else:
-        part2(sys.argv[2], expansion_rate)
+        solve(sys.argv[2], expansion_rate)
