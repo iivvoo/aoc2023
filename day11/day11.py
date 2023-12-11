@@ -40,6 +40,7 @@ class Universe:
                     self.galaxies.append(Galaxy(r, c))
 
     def distance(self, one: Galaxy, other: Galaxy) -> int:
+        """(shortest) distance between galaxies, taking expansion into account"""
         return sum(
             self.expansion_rate if r in self.expanded_rows else 1
             for r in range(min(one.r, other.r), max(one.r, other.r))
