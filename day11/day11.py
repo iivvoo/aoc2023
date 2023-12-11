@@ -23,7 +23,7 @@ class Universe:
     def add(self, row: str) -> None:
         self.rows.append(list(row))
 
-    def expand(self, rate=2) -> None:
+    def expand(self) -> None:
         """expand rows and cols"""
         for i, r in enumerate(self.rows):
             if set(r) == {"."}:
@@ -70,12 +70,9 @@ def part1(filename: str) -> None:
     universe.expand()
     universe.collect()
 
-    s = 0
+    answer = sum(universe.distance(g, h) for g, h in itertools.combinations(universe.galaxies, 2))
 
-    for g, h in itertools.combinations(universe.galaxies, 2):
-        s += universe.distance(g, h)
-
-    print(s)
+    print(answer)
 
 
 def part2(filename: str, expansion_rate=1000000) -> None:
@@ -87,12 +84,9 @@ def part2(filename: str, expansion_rate=1000000) -> None:
     universe.expand()
     universe.collect()
 
-    s = 0
+    answer = sum(universe.distance(g, h) for g, h in itertools.combinations(universe.galaxies, 2))
 
-    for g, h in itertools.combinations(universe.galaxies, 2):
-        s += universe.distance(g, h)
-
-    print(s)
+    print(answer)
 
 
 if __name__ == "__main__":
