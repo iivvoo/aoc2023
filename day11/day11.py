@@ -68,10 +68,8 @@ if __name__ == "__main__":
         print(f"Usage: python {sys.argv[0]} [1|2] <input_file> [expansion_rate]")
         sys.exit(1)
 
-    expansion_rate = 1000000
+    expansion_rate = int(sys.argv[3]) if len(sys.argv) == 4 else 1000000
 
-    if len(sys.argv) == 4:
-        expansion_rate = int(sys.argv[3])
     if sys.argv[1] == "1":
         solve(sys.argv[2], expansion_rate=2)
     else:
