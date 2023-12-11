@@ -24,13 +24,10 @@ class Universe:
 
     def expand(self) -> None:
         """expand rows and cols"""
-        for i, r in enumerate(self.rows):
-            if set(r) == {"."}:
-                self.expanded_rows.append(i)
-
-        for i in range(len(self.rows[0])):
-            if set(r[i] for r in self.rows) == {"."}:
-                self.expanded_cols.append(i)
+        self.expanded_rows = [i for i, r in enumerate(self.rows) if set(r) == {"."}]
+        self.expanded_cols = [
+            i for i in range(len(self.rows[0])) if set(r[i] for r in self.rows) == {"."}
+        ]
 
     def collect(self) -> None:
         """collect galaxies"""
