@@ -15,7 +15,7 @@ class Terrain:
     def add(self, row: str) -> None:
         self.rows.append(row)
 
-    def find_reflection(self, max_smudges=0) -> Tuple[int, int]:  # left, above
+    def find_reflection(self, max_smudges: int = 0) -> Tuple[int, int]:  # left, above
         # find vertical reflection
         for r in range(1, len(self.rows)):
             rnge = min(r, len(self.rows) - r)
@@ -44,11 +44,8 @@ class Terrain:
 
         return 0, 0
 
-    def __str__(self) -> str:
-        return "\n".join(self.rows)
 
-
-def solve(filename: str, smudges=0) -> None:
+def solve(filename: str, smudges: int = 0) -> None:
     terrains = [Terrain()]
     for line in open(filename, "r"):
         if line == "\n":
