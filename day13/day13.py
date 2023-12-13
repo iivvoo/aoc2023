@@ -3,21 +3,10 @@
 import sys
 from typing import List, Tuple
 
-"""
-  aabbcc
-  ddeeff
-  ddeeff
-  aabbcc
-
-als ergens splits en rows joint,
-
-aabbcc ddeeff ddeeff aabbcc
-dus reverse 2e helft
-"""
-
 
 def countdiff(a: str, b: str) -> int:
     return sum(1 if a != b else 0 for (a, b) in zip(a, b))
+
 
 class Terrain:
     def __init__(self):
@@ -26,24 +15,31 @@ class Terrain:
     def add(self, row: str) -> None:
         self.rows.append(row)
 
-    def find_reflection(self, diff = 0) -> Tuple[int, int]:
+    def find_reflection(self, max_smudges=0) -> Tuple[int, int]:  # left, above
         # find vertical reflection
         for r in range(1, len(self.rows)):
-            above = r
-            below = len(self.rows) - r
-            rnge = min(above, below)
+            rnge = min(r, len(self.rows) - r)
 
-            diffs = sum(countdiff(a, b) for (a, b) in
-                        zip(self.rows[r - rnge : r], self.rows[r : r + rnge][::-1]))
-            if diffs == diff:
+            diffs = sum(
+                countdiff(a, b)
+                for (a, b) in zip(
+                    self.rows[r - rnge : r], self.rows[r : r + rnge][::-1]
+                )
+            )
+            if diffs == max_smudges:
                 return 0, r
 
+        # find horizontal reflection
         for c in range(1, len(self.rows[0])):
-            before = c
-            after = len(self.rows[0]) - c
-            rnge = min(before, after)
+            rnge = min(c, len(self.rows[0]) - c)
 
-            if sum(1 if row[c - rnge : c] != row[c : c + rnge][::-1] else 0 for row in self.rows ) == diff:
+            if (
+                sum(
+                    countdiff(row[c - rnge : c], row[c : c + rnge][::-1])
+                    for row in self.rows
+                )
+                == max_smudges
+            ):
                 return c, 0
 
         return 0, 0
@@ -64,10 +60,8 @@ def solve(filename: str, smudges=0) -> None:
     for terrain in terrains:
         left, above = terrain.find_reflection(smudges)
 
-        print(left, above)
         s += left + 100 * above
 
-    # 18300 too low in pt 2
     print(s)
 
 
