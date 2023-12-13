@@ -16,6 +16,9 @@ dus reverse 2e helft
 """
 
 
+def countdiff(a: str, b: str) -> int:
+    return sum(1 if a != b else 0 for (a, b) in zip(a, b))
+
 class Terrain:
     def __init__(self):
         self.rows: List[str] = []
@@ -23,14 +26,16 @@ class Terrain:
     def add(self, row: str) -> None:
         self.rows.append(row)
 
-    def find_reflection(self) -> Tuple[int, int]:
+    def find_reflection(self, diff = 0) -> Tuple[int, int]:
         # find vertical reflection
         for r in range(1, len(self.rows)):
             above = r
             below = len(self.rows) - r
             rnge = min(above, below)
 
-            if self.rows[r - rnge : r] == self.rows[r : r + rnge][::-1]:
+            diffs = sum(countdiff(a, b) for (a, b) in
+                        zip(self.rows[r - rnge : r], self.rows[r : r + rnge][::-1]))
+            if diffs == diff:
                 return 0, r
 
         for c in range(1, len(self.rows[0])):
@@ -38,7 +43,7 @@ class Terrain:
             after = len(self.rows[0]) - c
             rnge = min(before, after)
 
-            if all(row[c - rnge : c] == row[c : c + rnge][::-1] for row in self.rows):
+            if sum(1 if row[c - rnge : c] != row[c : c + rnge][::-1] else 0 for row in self.rows ) == diff:
                 return c, 0
 
         return 0, 0
@@ -47,7 +52,7 @@ class Terrain:
         return "\n".join(self.rows)
 
 
-def part1(filename: str) -> None:
+def solve(filename: str, smudges=0) -> None:
     terrains = [Terrain()]
     for line in open(filename, "r"):
         if line == "\n":
@@ -57,21 +62,13 @@ def part1(filename: str) -> None:
 
     s = 0
     for terrain in terrains:
-        left, above = terrain.find_reflection()
+        left, above = terrain.find_reflection(smudges)
 
         print(left, above)
-        if left == above == 0:
-            # breakpoint()
-            left, above = terrain.find_reflection()
-
         s += left + 100 * above
 
-    # 20561 is too low
+    # 18300 too low in pt 2
     print(s)
-
-
-def part2(filename: str) -> None:
-    pass
 
 
 if __name__ == "__main__":
@@ -79,6 +76,6 @@ if __name__ == "__main__":
         print(f"Usage: python {sys.argv[0]} [1|2] <input_file>")
         sys.exit(1)
     if sys.argv[1] == "1":
-        part1(sys.argv[2])
+        solve(sys.argv[2])
     else:
-        part2(sys.argv[2])
+        solve(sys.argv[2], smudges=1)
