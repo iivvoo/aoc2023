@@ -19,22 +19,17 @@ class Dish:
         self.rows.append(list(row))
 
     def tilt_line(self, line, reverse=False) -> str:
+        parts = "".join(line).split("#")
         if reverse:
-            return "#".join(
-                "." * x.count(".") + "O" * x.count("O")
-                for x in "".join(line).split("#")
-            )
-        return "#".join(
-            "O" * x.count("O") + "." * x.count(".") for x in "".join(line).split("#")
-        )
+            return "#".join("." * x.count(".") + "O" * x.count("O") for x in parts)
+        return "#".join("O" * x.count("O") + "." * x.count(".") for x in parts)
 
     def tilt(self, direction: Direction) -> None:
         if direction in [Direction.NORTH, Direction.SOUTH]:
             reverse = direction == Direction.SOUTH
 
             for c in range(len(self.rows[0])):
-                before = [r[c] for r in self.rows]
-                titled = self.tilt_line(before, reverse)
+                titled = self.tilt_line([r[c] for r in self.rows], reverse)
 
                 for i, t in enumerate(titled):
                     self.rows[i][c] = t
@@ -45,9 +40,6 @@ class Dish:
 
     def score(self) -> int:
         return sum(r.count("O") * (len(self.rows) - i) for i, r in enumerate(self.rows))
-
-    def __str__(self) -> str:
-        return "\n".join("".join(r) for r in self.rows)
 
 
 def part1(filename: str) -> None:
@@ -82,7 +74,7 @@ def part2(filename: str) -> None:
     psize = 50
     values = []
 
-    for _ in range(400):
+    while True:
         for dir in (Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST):
             d.tilt(direction=dir)
         values.append(d.score())
