@@ -3,6 +3,7 @@
 import sys
 from enum import Enum
 
+
 class Direction(Enum):
     NORTH = 0
     SOUTH = 1
@@ -17,11 +18,15 @@ class Dish:
     def add(self, row: str) -> None:
         self.rows.append(list(row))
 
-
     def tilt_line(self, line, reverse=False) -> str:
         if reverse:
-            return "#".join("."*x.count(".") + "O"*x.count("O") for x in "".join(line).split("#"))
-        return "#".join("O"*x.count("O") + "."*x.count(".") for x in "".join(line).split("#"))
+            return "#".join(
+                "." * x.count(".") + "O" * x.count("O")
+                for x in "".join(line).split("#")
+            )
+        return "#".join(
+            "O" * x.count("O") + "." * x.count(".") for x in "".join(line).split("#")
+        )
 
     def tilt(self, direction: Direction) -> None:
         if direction in [Direction.NORTH, Direction.SOUTH]:
@@ -30,14 +35,13 @@ class Dish:
             for c in range(len(self.rows[0])):
                 before = [r[c] for r in self.rows]
                 titled = self.tilt_line(before, reverse)
-                                        
+
                 for i, t in enumerate(titled):
                     self.rows[i][c] = t
         else:
             reverse = direction == Direction.WEST
             for i, r in enumerate(self.rows):
                 self.rows[i] = list(self.tilt_line(r, reverse))
-
 
     def score(self) -> int:
         return sum(r.count("O") * (len(self.rows) - i) for i, r in enumerate(self.rows))
@@ -62,25 +66,31 @@ def part2(filename: str) -> None:
     for line in open(filename, "r"):
         d.add(line.strip())
 
-    # find when repetition happens
-    # 
-    values = []
-    def isrepeating(v):
-        for i in range(100, len(v) - 100):
-            print(len(v[1:101]), len(v[i+1:i+101]))
-            if v[1:101] == v[i+1:i+101]:
+    def isrepeating(v: list[int], psize: int) -> int:
+        # psize is the size of the pattern at the end that we try to find earlier in v
+        if len(v) < psize * 3:
+            return -1
+
+        pattern = v[-psize:]
+        for i in range(len(v) - psize - 1, psize, -1):
+            if v[i : i + psize] == pattern:
                 return i
         return -1
 
-    for i in range(5000):
-        d.tilt(direction=Direction.NORTH)
-        d.tilt(direction=Direction.EAST)
-        d.tilt(direction=Direction.SOUTH)
-        d.tilt(direction=Direction.WEST)
+    # values are a bit trial/error - they have to be largish enough to find a
+    # confident repetition
+    psize = 50
+    values = []
+
+    for _ in range(400):
+        for dir in (Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST):
+            d.tilt(direction=dir)
         values.append(d.score())
 
-        if r := isrepeating(values) != -1:
-            print("Repeating at ", r)
+        if (r := isrepeating(values, psize)) != -1:
+            # r is where the repetition starts, len(values) - psize - r is the length of the full rep
+            idx = (1000_000_000 - r - 1) % (len(values) - psize - r)
+            print(values[r + idx])
             break
 
 
