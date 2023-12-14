@@ -18,7 +18,7 @@ class Dish:
     def add(self, row: str) -> None:
         self.rows.append(list(row))
 
-    def tilt_line(self, line, reverse=False) -> str:
+    def tilt_line(self, line: list[str], reverse=False) -> str:
         parts = "".join(line).split("#")
         if reverse:
             return "#".join("." * x.count(".") + "O" * x.count("O") for x in parts)
