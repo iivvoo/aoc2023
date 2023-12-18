@@ -151,7 +151,7 @@ class Contraption:
 
         all_steps = set()
 
-        while not all(b.dead for b in beams):
+        while True:
             active = set()
 
             for beam in beams:
@@ -173,6 +173,8 @@ class Contraption:
                     all_steps.add(b.steps[-1])
 
             beams |= active
+            if not active:
+                break
 
         return len(self.all_energized(beams))
 
