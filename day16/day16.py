@@ -62,11 +62,7 @@ class Beam:
 
         if next_pos is not None:
             next_step = Step(next_pos, self.direction)
-            if next_step in self.steps:
-                # print("Beam died because of loop")
-                self.dead = True
-            else:
-                self.steps.append(next_step)
+            self.steps.append(next_step)
 
     def clone(self) -> "Beam":
         return Beam(self.direction, self.steps.copy(), self.dead)
@@ -74,9 +70,8 @@ class Beam:
 
 @dataclass(frozen=True)
 class Splitter:
-    # direction: h / v
-    HORIZONTAL = 1
-    VERTICAL = 2
+    HORIZONTAL = 1  # -
+    VERTICAL = 2  # |
 
     position: Position
     direction: int
@@ -100,9 +95,8 @@ class Splitter:
 
 @dataclass(frozen=True)
 class Mirror:
-    # direction: / or \
-    FORWARD = 1
-    BACKWARD = 2
+    FORWARD = 1  # /
+    BACKWARD = 2  # \
 
     position: Position
     direction: int
@@ -130,10 +124,6 @@ class Mirror:
         return beam
 
 
-class Empty(Position):
-    pass
-
-
 class Contraption:
     def __init__(self):
         self.mirrors: dict[Position, Mirror] = {}
@@ -156,29 +146,18 @@ class Contraption:
     def all_energized(self, beams: set[Beam]) -> set[Position]:
         return reduce(lambda a, b: a | set(s.position for s in b.steps), beams, set())
 
-    def run(self) -> None:
-        beams = {Beam(Step.RIGHT, [Step(Position(0, 0), Step.RIGHT)])}
+    def run(self, start: Step) -> int:
+        beams = {Beam(start.direction, [start])}
 
-        loops = 0
+        all_steps = set()
 
         while not all(b.dead for b in beams):
-            # breakpoint()
-            e = len(self.all_energized(beams))
-            # if e == 11:
-            #     breakpoint()
-
             active = set()
 
             for beam in beams:
-                """
-
-                a beam can die if _any_ step exists
-                """
                 if beam.dead:
-                    # active.add(beam)
                     continue
 
-                # breakpoint()
                 if m := self.mirrors.get(beam.steps[-1].position):
                     active.add(m.apply(beam))
                 elif s := self.splitters.get(beam.steps[-1].position):
@@ -186,18 +165,16 @@ class Contraption:
                 else:
                     active.add(beam)
 
-            all_steps = reduce(lambda a, b: a | set(b.steps), beams, set())
             for b in active:
                 b.advance(len(self.rows), len(self.rows[0]))
                 if b.steps[-1] in all_steps:
                     b.dead = True
+                else:
+                    all_steps.add(b.steps[-1])
 
             beams |= active
-            loops += 1
-            if loops % 100 == 0:
-                self.print(beams)
 
-        print(len(self.all_energized(beams)))
+        return len(self.all_energized(beams))
 
     def print(self, beams):
         all_energized = self.all_energized(beams)
@@ -221,12 +198,33 @@ def part1(filename: str) -> None:
     for row in open(filename, "r"):
         c.add(row.strip())
 
-    print(c)
-    c.run()
+    print(c.run(Step(Position(0, 0), Step.RIGHT)))
 
 
 def part2(filename: str) -> None:
-    pass
+    c = Contraption()
+    for row in open(filename, "r"):
+        c.add(row.strip())
+
+    largest = 0
+
+    for row in range(len(c.rows)):
+        score = c.run(Step(Position(row, 0), Step.RIGHT))
+        if score > largest:
+            largest = score
+        score = c.run(Step(Position(row, len(c.rows[0]) - 1), Step.LEFT))
+        if score > largest:
+            largest = score
+
+    for col in range(len(c.rows[0])):
+        score = c.run(Step(Position(0, col), Step.DOWN))
+        if score > largest:
+            largest = score
+        score = c.run(Step(Position(0, len(c.rows) - 1), Step.UP))
+        if score > largest:
+            largest = score
+
+    print(largest)
 
 
 if __name__ == "__main__":
