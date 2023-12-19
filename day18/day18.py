@@ -3,6 +3,7 @@
 import sys
 from dataclasses import dataclass
 from enum import Enum
+import itertools
 
 
 @dataclass
@@ -11,19 +12,31 @@ class Instruction:
     steps: int
     color: str
 
-    def __init__(self, direction: str, steps: int, color: str):
+    def __init__(self, direction: str, steps: int):
         self.direction = direction
         self.steps = steps
-        self.color = color
 
     @classmethod
     def FromString(cls, s: str) -> "Instruction":
         parts = s.strip().split()
         direction = parts[0]
         steps = int(parts[1])
-        color = parts[2]
 
-        return cls(direction, steps, color)
+        return cls(direction, steps)
+
+    @classmethod
+    def FromString2(cls, s: str) -> "Instruction":
+        instr = s.strip().split()[-1]
+
+        hexlength = instr[2:-2]
+        hexdir = instr[-2]
+
+        direction = "RDLU"[int(hexdir)]
+        steps = int(hexlength, 16)
+        return cls(direction, steps)
+
+    def __str__(self) -> str:
+        return f"{self.direction} {self.steps}"
 
 
 class Lagoon:
@@ -35,21 +48,41 @@ class Lagoon:
 
         for instr in instructions:
             if instr.direction == "R":
-                for i in range(instr.steps):
-                    self.digs[(r, c)] = instr.color
+                for _ in range(instr.steps):
+                    self.digs[(r, c)] = "#"
                     c += 1
             if instr.direction == "L":
-                for i in range(instr.steps - 1, -1, -1):
-                    self.digs[(r, c)] = instr.color
+                for _ in range(instr.steps - 1, -1, -1):
+                    self.digs[(r, c)] = "#"
                     c -= 1
             if instr.direction == "U":
-                for i in range(instr.steps - 1, -1, -1):
-                    self.digs[(r, c)] = instr.color
+                for _ in range(instr.steps - 1, -1, -1):
+                    self.digs[(r, c)] = "#"
                     r -= 1
             if instr.direction == "D":
-                for i in range(instr.steps):
-                    self.digs[(r, c)] = instr.color
+                for _ in range(instr.steps):
+                    self.digs[(r, c)] = "#"
                     r += 1
+
+    def plot(self, instructions: list[Instruction]) -> None:
+        r, c = (0, 0)
+
+        self.digs[(r, c)] = 0
+
+        for instr in instructions:
+            if instr.direction == "R":
+                c += instr.steps
+
+            if instr.direction == "L":
+                c -= instr.steps
+
+            if instr.direction == "U":
+                r -= instr.steps
+
+            if instr.direction == "D":
+                r += instr.steps
+
+            self.digs[(r, c)] = instr.steps
 
     def fill(self, r=1, c=1):
         stack = [(r, c)]
@@ -78,6 +111,15 @@ class Lagoon:
                     print(".", end="")
             print()
 
+    def shoelace(self):
+        points = list(self.digs.keys())
+
+        s = sum(
+            (x1 * y2) - (y1 * x2) for (y1, x1), (y2, x2) in itertools.pairwise(points)
+        )
+
+        return int((s + sum(d for d in self.digs.values()) + 2) / 2)
+
 
 def part1(filename: str) -> None:
     instructions: list[Instruction] = []
@@ -92,10 +134,18 @@ def part1(filename: str) -> None:
     print()
     l.print()
     print(len(l.digs))
+    print(l.shoelace())
 
 
 def part2(filename: str) -> None:
-    pass
+    instructions: list[Instruction] = []
+
+    for line in open(filename, "r"):
+        instructions.append(Instruction.FromString2(line))
+
+    l = Lagoon()
+    l.plot(instructions)
+    print(l.shoelace())
 
 
 if __name__ == "__main__":
