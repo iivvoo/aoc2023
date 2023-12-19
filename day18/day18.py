@@ -134,7 +134,6 @@ def part1(filename: str) -> None:
     print()
     l.print()
     print(len(l.digs))
-    print(l.shoelace())
 
 
 def part2(filename: str) -> None:
